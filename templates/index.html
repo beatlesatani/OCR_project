@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to the Home Page</h1>
+
+    <!-- Display the uploaded image if available -->
+    {% if image_data %}
+    <img src="data:image/jpeg;base64, {{ image_data }}" width="300">
+    {% endif %}
+
+    <!-- Add an image upload form -->
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload Image">
+    </form>
+</body>
+</html>
+
