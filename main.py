@@ -17,7 +17,7 @@ def home():
 if __name__ == '__main__':
     app.run()
 
-
+ 
 """
 So far, codes works,
 1.upload the picture from local 
