@@ -9,6 +9,7 @@ def home():
         file = request.files['file']
         if file:
             # Read the image file and encode it as base64
+            # make sure that train_model can take this image 
             image_data = base64.b64encode(file.read()).decode('utf-8')
             return render_template('index.html', image_data=image_data)
     return render_template('index.html', image_data=None)
