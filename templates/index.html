@@ -8,6 +8,7 @@
 
     <!-- Display the uploaded image if available -->
     {% if image_data %}
+    <h2>Uploaded Image</h2>
     <img src="data:image/jpeg;base64, {{ image_data }}" width="300">
     {% endif %}
 
@@ -16,6 +17,18 @@
         <input type="file" name="file">
         <input type="submit" value="Upload Image">
     </form>
+
+    <!-- Add a text input field for user input -->
+    <form action="/" method="POST">
+        <label for="user_input">Enter text:</label>
+        <input type="text" name="user_input" id="user_input">
+        <input type="submit" value="Submit Text">
+    </form>
+
+    <!-- Display the search result if available -->
+    {% if search_result %}
+    <h2>Search Result</h2>
+    <p>{{ search_result }}</p>
+    {% endif %}
 </body>
 </html>
-
