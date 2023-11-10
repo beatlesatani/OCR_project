@@ -7,13 +7,17 @@ import numpy as np
 from imutils import contours
 import matplotlib.pyplot as plt
 import glob
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
-#from natsort import natsorted 
+import cv2
+import matplotlib.pyplot as plt
+
+
 
 
 #### ２．set up pictures ####
-input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/happy.png"
+input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/watermelon.png"
 
 # 膨張処理の設定
 #【横書き】大まかな文字領域の検出（ブロック検出）のための膨張処理（カーネルサイズ・膨張処理回数）の設定
@@ -96,25 +100,76 @@ def block_contours (OCR_input_file):
     block_ROI_index += 1
 
     #result.append([x, y, w, h])
-    result.append([x_fix,y_fix,w_fix,h_fix])
-
-
-  # 画面に矩形の輪郭を描画 （描画機能）
-  for x, y, w, h in result:
-      cv2.rectangle(img, (x, y), (x+w, y+h), (100, 255, 100), 3)
-
-'''
-  # 解説用のコメント（文字領域の輪郭検出・抽出）
-  print('\n【Text detection・Contours】')
-
-  # 文字領域の輪郭検出・抽出結果の表示
-  plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-  plt.savefig('block_text-detection.png', dpi=300)
-  plt.show()
-'''
+    result.append([x_fix, y_fix, w_fix, h_fix])
 
 
 ##excute block_contours
 block_contours(input_file)
 
-model = load_model("/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5")
+# Specify the path to the SavedModel directory
+saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5"
+# Load the model
+model = tf.keras.models.load_model(saved_model_path)
+image_width = 32
+image_height = 32
+
+#### ８．画像判定のためのプログラム ####
+folder = ['あ','い','う','え','お',
+          'か','き','く','け','こ',
+          'さ','し','す','せ','そ',
+          'た','ち','つ','て','と',
+          'な','に','ぬ','ね','の',
+          'は','ひ','ふ','へ','ほ',
+          'ま','み','む','め','も',
+          'や','ゆ','よ',
+          'ら','り','る','れ','ろ',
+          'わ','ん','を']
+
+
+def invert_monochrome_colors(image):
+    if image is not None:
+        inverted_image = 255 - image
+        return inverted_image
+    else:
+        print("Failed to load the image.")
+        return None
+
+# List to store the processed images
+result = []
+file_list = glob.glob("block_ROI_img*.png")
+image_files = sorted(file_list)
+
+# Loop through the image files
+for i, image_file in enumerate(image_files):
+    # Load the image using OpenCV
+    img = cv2.imread(image_file)
+    # Invert the colors of the processed image
+    img = invert_monochrome_colors(img)
+
+    # Convert the image to grayscale and resize it to 32x32
+    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img_resized = cv2.resize(img_gray, (image_width, image_height))
+
+    # Append the label (i) and the processed image to the result list
+    result.append([i, img_resized])
+
+im_size = 32
+im_color = 1
+in_shape = (im_size, im_size, im_color)
+
+new_image = []
+for d in result:
+  (num, img) = d
+  img = img.astype('float').reshape(im_size, im_size, im_color) / 255
+  new_image.append(img)
+new_image = np.array(new_image)
+
+predicted = model.predict(new_image)
+predictions = np.argmax(predicted, axis=1)
+corresponding_labels = [folder[i] for i in predictions]
+print(corresponding_labels)
+
+#毎回写真を消す
+file_list = glob.glob("block_ROI_img*png")
+for file in file_list:
+  os.remove(file)
