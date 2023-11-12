@@ -24,8 +24,8 @@ The OCR model detects contours and generates character images for the CNN model 
 - Morphological Dilation
 - Adjusting Rectangle Area for Image Generation
 
-[https://github.com/beatlesatani/OCR_project/blob/main/OCR_1.ipynb]
-[https://github.com/beatlesatani/OCR_project/blob/main/OCR_2.ipynb]
+[OCR_1.ipynb](https://github.com/beatlesatani/OCR_project/blob/main/OCR_1.ipynb)
+[OCR_2.ipynb](https://github.com/beatlesatani/OCR_project/blob/main/OCR_2.ipynb)
 
 ## 3. Model Deployment
 
