@@ -25,7 +25,7 @@ def home():
     search_result = None
 
     if request.method == "POST":
-        # Check if 'file' is in the request
+    # Check if 'file' is in the request
         if 'file' in request.files:
             file = request.files['file']
             if file:
@@ -48,16 +48,17 @@ def home():
                     if my_deck is None:
                         my_deck = create_deck()
                     add_card_to_deck(my_deck, user_input, search_result)
+        else:
+            # Retrieve the user input from the keyboard 
+            user_input = request.form.get("user_input")
+            if user_input:
+                search_result = search_word_in_dictionary(user_input)
+                if my_deck is None:
+                    my_deck = create_deck()
+                add_card_to_deck(my_deck, user_input, search_result)
 
-        # Retrieve the user input from the keyboard 
-        user_input = request.form.get("user_input")
-        if user_input:
-            search_result = search_word_in_dictionary(user_input)
-            if my_deck is None:
-                my_deck = create_deck()
-            add_card_to_deck(my_deck, user_input, search_result)
-            
     return render_template("index.html", user_input=user_input, image_data=image_data, search_result=search_result)
+
 
 
 

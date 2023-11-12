@@ -3,8 +3,10 @@
 <head>
     <title>Home</title>
 </head>
-<body>
-    <h1>Welcome to the Home Page</h1>
+<body style="background-color: lightblue;">
+    <h1>Welcome!</h1>
+
+    <p>Explore the meanings of Japanese words from images or text. Once you're done using the website, flashcards will be created for you automatically!</p>
 
     <!-- Display the uploaded image if available -->
     {% if image_data %}
@@ -24,6 +26,12 @@
         <input type="text" name="user_input" id="user_input">
         <input type="submit" value="Submit Text">
     </form>
+
+    <!-- Display the user_input if available -->
+    {% if user_input and request.method == 'POST' %}
+    <h2>User Input</h2>
+    <p>{{ user_input }}</p>
+    {% endif %}
 
     <!-- Display the search result if available -->
     {% if search_result %}
