@@ -10,43 +10,30 @@ import glob
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
-import cv2
-import matplotlib.pyplot as plt
 
 
-
-
-#### ２．set up pictures ####
+#Inport the picture
 input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/watermelon.png"
-
-# 膨張処理の設定
-#【横書き】大まかな文字領域の検出（ブロック検出）のための膨張処理（カーネルサイズ・膨張処理回数）の設定
-block_kernel_hight = 5  # カーネルの縦の高さ
-block_kernel_width = 5  # カーネルの横の幅
-block_iterations = 4    # 膨張処理回数
-
-# 輪郭のカット設定
-# ブロック検出：文字領域検出した輪郭の「横幅」が、以下の範囲なら輪郭を残す
-block_horizontal_height_minimum = 5  # 最小値（ピクセル）
-block_horizontal_height_max = 1000   # 最大値（ピクセル）
-
-# ブロック検出：文字領域検出した輪郭の「縦の高さ」が、以下の範囲なら輪郭を残す
-block_vertical_height_minimum = 5  # 最小値（ピクセル）
-block_vertical_height_max = 1000   # 最大値（ピクセル）
-
-
-
-####  ４．大まかな文字領域の検出（ブロック検出） ####
-# 画像から、ブロック検出をおこないます
-# 「block_ROI_img〜.png」（ブロック検出画像）を作成します
-# 「block_text-detection.png」（ブロック検出の結果を、元の画像に描画した画像）を作成します
-
 
 # Process for detecting and extracting character regions from images
 def block_contours (OCR_input_file):
+
+  # setting for morphological dilation
+  block_kernel_hight = 5  # height of kernel
+  block_kernel_width = 5  # width of kernel
+  block_iterations = 4    # num of iteration
+  #height range of rectangle area
+  block_horizontal_height_minimum = 5  
+  block_horizontal_height_max = 1000  
+  #width range of rectangle area
+  block_vertical_height_minimum = 5  
+  block_vertical_height_max = 1000 
+
+  #image size preprocessing
   img = cv2.imread(OCR_input_file)
   width = 450
   height = 350
+
   img = cv2.resize(img, (width, height))
 
   # convert image to monochrome gray picture
@@ -55,17 +42,9 @@ def block_contours (OCR_input_file):
   # convert to monochrome image
   retval, img_binary = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-  # 白部分の膨張処理（Dilation）：モルフォロジー変換 - 2値画像を対象
+  # morphological dilation for binary image
   kernel = np.ones((block_kernel_hight, block_kernel_width),np.uint8) 
   img_dilation = cv2.dilate(img_binary,kernel,iterations = block_iterations)
-
-  '''
-  print('\n【Binarization】')
-
-  # 膨張処理後の2値化画像の表示
-  plt.imshow(cv2.cvtColor(img_dilation, cv2.COLOR_BGR2RGB))
-  plt.show()
-  '''
 
   # detect contour
   #cnts: coordinates of contour,  hierarchy: how to detect contour
@@ -74,7 +53,6 @@ def block_contours (OCR_input_file):
 
   cnts, hierarchy = cv2.findContours(img_dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
   cnts, hierarchy = contours.sort_contours(cnts, method='left-to-right')
-
 
   # first setting of ROI
   block_ROI_index = 0
@@ -99,63 +77,53 @@ def block_contours (OCR_input_file):
     cv2.imwrite('block_ROI_img{}.png'.format(block_ROI_index), block_ROI)
     block_ROI_index += 1
 
-    #result.append([x, y, w, h])
-    result.append([x_fix, y_fix, w_fix, h_fix])
-
-
 ##excute block_contours
 block_contours(input_file)
 
+
+
+
 # Specify the path to the SavedModel directory
-saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5"
+saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5" #このpath設定セキュリティ??
 # Load the model
-model = tf.keras.models.load_model(saved_model_path)
-image_width = 32
-image_height = 32
+model = load_model(saved_model_path)
+
+im_size = 32
+im_color = 1
+in_shape = (im_size, im_size, im_color)
+
 
 #### ８．画像判定のためのプログラム ####
 folder = ['あ','い','う','え','お',
-          'か','き','く','け','こ',
-          'さ','し','す','せ','そ',
-          'た','ち','つ','て','と',
-          'な','に','ぬ','ね','の',
-          'は','ひ','ふ','へ','ほ',
-          'ま','み','む','め','も',
-          'や','ゆ','よ',
-          'ら','り','る','れ','ろ',
-          'わ','ん','を']
+              'か','き','く','け','こ',
+              'さ','し','す','せ','そ',
+              'た','ち','つ','て','と',
+              'な','に','ぬ','ね','の',
+              'は','ひ','ふ','へ','ほ',
+              'ま','み','む','め','も',
+              'や','ゆ','よ',
+              'ら','り','る','れ','ろ',
+              'わ','ん','を']
 
-
-def invert_monochrome_colors(image):
-    if image is not None:
-        inverted_image = 255 - image
-        return inverted_image
-    else:
-        print("Failed to load the image.")
-        return None
 
 # List to store the processed images
 result = []
 file_list = glob.glob("block_ROI_img*.png")
 image_files = sorted(file_list)
 
+
 # Loop through the image files
 for i, image_file in enumerate(image_files):
     # Load the image using OpenCV
     img = cv2.imread(image_file)
     # Invert the colors of the processed image
-    img = invert_monochrome_colors(img)
-
+    img = 255 - img
     # Convert the image to grayscale and resize it to 32x32
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_resized = cv2.resize(img_gray, (image_width, image_height))
+    img_resized = cv2.resize(img_gray, (im_size, im_size))
 
     # Append the label (i) and the processed image to the result list
     result.append([i, img_resized])
-
-im_size = 32
-im_color = 1
-in_shape = (im_size, im_size, im_color)
 
 new_image = []
 for d in result:
@@ -169,7 +137,10 @@ predictions = np.argmax(predicted, axis=1)
 corresponding_labels = [folder[i] for i in predictions]
 print(corresponding_labels)
 
+
 #毎回写真を消す
 file_list = glob.glob("block_ROI_img*png")
 for file in file_list:
   os.remove(file)
+
+

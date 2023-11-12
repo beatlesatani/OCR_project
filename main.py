@@ -1,11 +1,15 @@
+import ocr_handwritten
 from flask import Flask, render_template, request
 import base64
 import requests
 import random
 import genanki
 import atexit
+import os 
 
 app = Flask(__name__)
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Initialize my_deck as None
 my_deck = None
@@ -22,9 +26,16 @@ def home():
             file = request.files['file']
             if file:
                 # Read the image file and encode it as base64
-                image_data = base64.b64encode(file.read()).decode('utf-8')
+                file_64 = file
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+                file.save(file_path)
+                image_data = base64.b64encode(file_64.read()).decode('utf-8')
+                ocr_handwritten.block_contours(file_path)
+                os.remove(file_path)
 
-        # Retrieve the user input from the form
+                # use black_ROI-picutres
+
+        # Retrieve the user input from the keyboard 
         user_input = request.form.get("user_input")
         if user_input:
             search_result = search_word_in_dictionary(user_input)
@@ -34,6 +45,7 @@ def home():
             add_card_to_deck(my_deck, user_input, search_result)
             
     return render_template("index.html", user_input=user_input, image_data=image_data, search_result=search_result)
+
 
 # Function to search for words in the dictionary and retrieve meanings
 def search_word_in_dictionary(word):
@@ -51,11 +63,13 @@ def search_word_in_dictionary(word):
     else:
         return "Word not found or API error"
 
+
 # Function to create and return a my_deck
 def create_deck():
     sec_random = random.randrange(1 << 30, 1 << 31)
     my_deck = genanki.Deck(sec_random, 'English')
     return my_deck
+
 
 # Function to add a card to the my_deck
 def add_card_to_deck(my_deck, wor, defi):
@@ -75,10 +89,12 @@ def add_card_to_deck(my_deck, wor, defi):
     my_note = genanki.Note(model=my_model, fields=[str(wor), str(defi)])
     my_deck.add_note(my_note)
 
+
 # Function to write the my_deck to the output.apkg file
 def write_deck_to_file():
     if my_deck:
         genanki.Package(my_deck).write_to_file('output.apkg')
+
 
 atexit.register(write_deck_to_file)
 
