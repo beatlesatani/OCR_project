@@ -18,18 +18,22 @@ my_deck = None
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    global my_deck  # Move this line here
+
     user_input = None
     image_data = None
     search_result = None
 
     if request.method == "POST":
+        # Check if 'file' is in the request
         if 'file' in request.files:
             file = request.files['file']
             if file:
                 # Read the image file and encode it as base64
+                file_64 = file
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
                 file.save(file_path)
-                image_data = base64.b64encode(file.read()).decode('utf-8')
+                image_data = base64.b64encode(file_64.read()).decode('utf-8')
                 ocr_handwritten.block_contours(file_path)
                 os.remove(file_path)
                 saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5"
@@ -38,23 +42,22 @@ def home():
                 predicted = model.predict(processed_images)
                 predictions = np.argmax(predicted, axis=1)
                 corresponding_labels = [folder[i] for i in predictions]
-                image_input = ''.join(corresponding_labels)
-        else:
-            image_input = ""
+                user_input = ''.join(corresponding_labels)
+                if user_input:
+                    search_result = search_word_in_dictionary(user_input)
+                    if my_deck is None:
+                        my_deck = create_deck()
+                    add_card_to_deck(my_deck, user_input, search_result)
 
         # Retrieve the user input from the keyboard 
-        text_input = request.form.get("user_input", "")
-        search_result = text_input + image_input
-
-        if text_input:
-            search_result += search_word_in_dictionary(text_input)
-
-        global my_deck
-        if my_deck is None:
-            my_deck = create_deck()
-        add_card_to_deck(my_deck, text_input, search_result)
-
-    return render_template("index.html", user_input=text_input, image_data=image_data, search_result=search_result)
+        user_input = request.form.get("user_input")
+        if user_input:
+            search_result = search_word_in_dictionary(user_input)
+            if my_deck is None:
+                my_deck = create_deck()
+            add_card_to_deck(my_deck, user_input, search_result)
+            
+    return render_template("index.html", user_input=user_input, image_data=image_data, search_result=search_result)
 
 
 
