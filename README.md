@@ -43,3 +43,5 @@ An automated flashcard generator that uses the Jisho API to retrieve word meanin
 
 [Link to Jisho API](https://jisho.org/)
 
+[Link to Notebook](link_to_ocr_model_notebook)
+
