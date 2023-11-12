@@ -6,6 +6,8 @@ import random
 import genanki
 import atexit
 import os 
+import tensorflow as tf
+import numpy as np
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
@@ -32,8 +34,13 @@ def home():
                 image_data = base64.b64encode(file_64.read()).decode('utf-8')
                 ocr_handwritten.block_contours(file_path)
                 os.remove(file_path)
-
-                # use black_ROI-picutres
+                saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5" #このpath設定セキュリティ??
+                model = tf.keras.models.load_model(saved_model_path)
+                processed_images = ocr_handwritten.process_images()
+                predicted = model.predict(processed_images)
+                predictions = np.argmax(predicted, axis=1)
+                corresponding_labels = [folder[i] for i in predictions]
+                user_input = ''.join(corresponding_labels)
 
         # Retrieve the user input from the keyboard 
         user_input = request.form.get("user_input")
@@ -95,6 +102,17 @@ def write_deck_to_file():
     if my_deck:
         genanki.Package(my_deck).write_to_file('output.apkg')
 
+
+folder = ['あ', 'い', 'う', 'え', 'お',
+          'か', 'き', 'く', 'け', 'こ',
+          'さ', 'し', 'す', 'せ', 'そ',
+          'た', 'ち', 'つ', 'て', 'と',
+          'な', 'に', 'ぬ', 'ね', 'の',
+          'は', 'ひ', 'ふ', 'へ', 'ほ',
+          'ま', 'み', 'む', 'め', 'も',
+          'や', 'ゆ', 'よ',
+          'ら', 'り', 'る', 'れ', 'ろ',
+          'わ', 'ん', 'を']
 
 atexit.register(write_deck_to_file)
 

@@ -11,14 +11,13 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 import pandas as pd
 
-
 #Inport the picture
-input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/watermelon.png"
+input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/mountain.png"
+
 
 # Process for detecting and extracting character regions from images
-def block_contours (OCR_input_file):
-
-  # setting for morphological dilation
+def block_contours(OCR_input_file):
+# setting for morphological dilation
   block_kernel_hight = 5  # height of kernel
   block_kernel_width = 5  # width of kernel
   block_iterations = 4    # num of iteration
@@ -78,69 +77,71 @@ def block_contours (OCR_input_file):
     block_ROI_index += 1
 
 ##excute block_contours
-block_contours(input_file)
+#block_contours(input_file)
 
 
+def process_images():
+    im_size = 32
+    im_color = 1
 
+    # List to store the processed images
+    result = []
+    file_list = glob.glob("block_ROI_img*.png")
+    image_files = sorted(file_list)
 
-# Specify the path to the SavedModel directory
-saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5" #このpath設定セキュリティ??
-# Load the model
-model = load_model(saved_model_path)
+    # Loop through the image files
+    for i, image_file in enumerate(image_files):
+        # Load the image using OpenCV
+        img = cv2.imread(image_file)
+        # Invert the colors of the processed image
+        img = 255 - img
+        # Convert the image to grayscale and resize it to 32x32
+        img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img_resized = cv2.resize(img_gray, (im_size, im_size))
 
-im_size = 32
-im_color = 1
-in_shape = (im_size, im_size, im_color)
+        # Append the label (i) and the processed image to the result list
+        result.append([i, img_resized])
+
+    new_image = []
+    for d in result:
+        (num, img) = d
+        img = img.astype('float').reshape(im_size, im_size, im_color) / 255
+        new_image.append(img)
+    new_image = np.array(new_image)
+
+    # Delete processed images
+    file_list = glob.glob("block_ROI_img*png")
+    for file in file_list:
+        os.remove(file)
+
+    return new_image
 
 
 #### ８．画像判定のためのプログラム ####
-folder = ['あ','い','う','え','お',
-              'か','き','く','け','こ',
-              'さ','し','す','せ','そ',
-              'た','ち','つ','て','と',
-              'な','に','ぬ','ね','の',
-              'は','ひ','ふ','へ','ほ',
-              'ま','み','む','め','も',
-              'や','ゆ','よ',
-              'ら','り','る','れ','ろ',
-              'わ','ん','を']
+folder = ['あ', 'い', 'う', 'え', 'お',
+          'か', 'き', 'く', 'け', 'こ',
+          'さ', 'し', 'す', 'せ', 'そ',
+          'た', 'ち', 'つ', 'て', 'と',
+          'な', 'に', 'ぬ', 'ね', 'の',
+          'は', 'ひ', 'ふ', 'へ', 'ほ',
+          'ま', 'み', 'む', 'め', 'も',
+          'や', 'ゆ', 'よ',
+          'ら', 'り', 'る', 'れ', 'ろ',
+          'わ', 'ん', 'を']
 
-
-# List to store the processed images
-result = []
-file_list = glob.glob("block_ROI_img*.png")
-image_files = sorted(file_list)
-
-
-# Loop through the image files
-for i, image_file in enumerate(image_files):
-    # Load the image using OpenCV
-    img = cv2.imread(image_file)
-    # Invert the colors of the processed image
-    img = 255 - img
-    # Convert the image to grayscale and resize it to 32x32
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_resized = cv2.resize(img_gray, (im_size, im_size))
-
-    # Append the label (i) and the processed image to the result list
-    result.append([i, img_resized])
-
-new_image = []
-for d in result:
-  (num, img) = d
-  img = img.astype('float').reshape(im_size, im_size, im_color) / 255
-  new_image.append(img)
-new_image = np.array(new_image)
-
-predicted = model.predict(new_image)
+#When use functions in main.py, comment out this part
+'''
+block_contours (input_file)
+saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5" #このpath設定セキュリティ??
+model = tf.keras.models.load_model(saved_model_path)
+processed_images = process_images()
+predicted = model.predict(processed_images)
 predictions = np.argmax(predicted, axis=1)
 corresponding_labels = [folder[i] for i in predictions]
-print(corresponding_labels)
+outcome = ''.join(corresponding_labels)
+print(outcome)
+'''
 
 
-#毎回写真を消す
-file_list = glob.glob("block_ROI_img*png")
-for file in file_list:
-  os.remove(file)
 
 
