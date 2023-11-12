@@ -43,20 +43,3 @@ An automated flashcard generator that uses the Jisho API to retrieve word meanin
 
 [Link to Jisho API](https://jisho.org/)
 
-## Usage
-
-### Prerequisites
-- Python 3.x
-- Required libraries (list them if any)
-
-### Instructions
-1. Clone the repository.
-2. Install dependencies.
-3. Follow individual notebook instructions for CNN and OCR models.
-4. Run main.py for flashcard generation.
-
-## Contact Information
-For questions or contributions, feel free to reach out at [your-email@example.com].
-
-## License
-This project is licensed under the [License Name] - see the [LICENSE.md](LICENSE.md) file for details.
