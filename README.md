@@ -6,11 +6,19 @@
 This component focuses on detecting Hiragana characters using a CNN model. The dataset is sourced from ETL文字データベース, and the model is trained with a modified size of 32x32 images.
 
 ### Model Architecture
+1.CNN model
 - Feature Extraction: Kernel size=3, Strides=1, Filters=32, Activation=ReLU
 - Pooling: MaxPooling2D
 - Optimizer: RMSprop()
 - Loss Function: Sparse Categorical Crossentropy
-- Accuracy: 100%
+- Accuracy: 98.11%
+
+2. AlexNet model
+- 5 convolutional layers.
+- 3 fully connected layers
+- Optimizer: RMSprop()
+- Loss Function: Sparse Categorical Crossentropy
+- Accuracy: 99.38%
 
 [Notebook for recognition model](https://github.com/beatlesatani/OCR_project/blob/d14516a2c8d4bba47315db06f539d93973656dc7/recognition_modeling.ipynb)
 
