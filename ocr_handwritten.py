@@ -11,7 +11,7 @@ from tensorflow.keras.models import load_model
 import pandas as pd
 
 #Inport the picture
-input_file = "/Users/yusuke.s/Documents/GitHub/OCR_project/pictures/mountain.png"
+input_file = "your image path"
 
 
 # Process for detecting and extracting character regions from images
@@ -131,7 +131,7 @@ folder = ['あ', 'い', 'う', 'え', 'お',
 #When use functions in main.py, comment out this part
 '''
 block_contours (input_file)
-saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5" #このpath設定セキュリティ??
+saved_model_path = "your model path" 
 model = tf.keras.models.load_model(saved_model_path)
 processed_images = process_images()
 predicted = model.predict(processed_images)
