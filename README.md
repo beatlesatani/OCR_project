@@ -12,7 +12,7 @@ This component focuses on detecting Hiragana characters using a CNN model. The d
 - Loss Function: Sparse Categorical Crossentropy
 - Accuracy: 100%
 
-[Link to Notebook](link_to_cnn_handwritten_recognition_notebook)
+[Notebook for recognition model](https://github.com/beatlesatani/OCR_project/blob/d14516a2c8d4bba47315db06f539d93973656dc7/recognition_modeling.ipynb)
 
 ## 2. OCR Model
 
@@ -44,6 +44,7 @@ An automated flashcard generator that uses the Jisho API to retrieve word meanin
 3. Anki flashcards are generated and exported.
 
 [Link to Jisho API](https://jisho.org/)
+[Link to Anki API](https://ankiweb.net/shared/info/2055492159)
 
-[Link to Notebook](link_to_ocr_model_notebook)
+
 
