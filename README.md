@@ -12,7 +12,6 @@ This component focuses on detecting Hiragana characters using a CNN model. The d
 - Optimizer: RMSprop()
 - Loss Function: Sparse Categorical Crossentropy
 - Accuracy: 98.11%
-
 2. AlexNet model
 - 5 convolutional layers.
 - 3 fully connected layers
