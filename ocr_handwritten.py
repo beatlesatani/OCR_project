@@ -31,12 +31,9 @@ def block_contours(OCR_input_file):
   img = cv2.imread(OCR_input_file)
   width = 450
   height = 350
-
   img = cv2.resize(img, (width, height))
-
   # convert image to monochrome gray picture
   img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
   # convert to monochrome image
   retval, img_binary = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
