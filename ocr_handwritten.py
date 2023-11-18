@@ -1,4 +1,3 @@
-
 #### 1.import ####
 
 import os
@@ -141,7 +140,4 @@ corresponding_labels = [folder[i] for i in predictions]
 outcome = ''.join(corresponding_labels)
 print(outcome)
 '''
-
-
-
 
