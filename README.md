@@ -6,13 +6,20 @@
 This component focuses on detecting Hiragana characters using a CNN model. The dataset is sourced from ETL文字データベース, and the model is trained with a modified size of 32x32 images.
 
 ### Model Architecture
+1.CNN model
 - Feature Extraction: Kernel size=3, Strides=1, Filters=32, Activation=ReLU
 - Pooling: MaxPooling2D
 - Optimizer: RMSprop()
 - Loss Function: Sparse Categorical Crossentropy
-- Accuracy: 100%
+- Accuracy: 98.11%
+2. AlexNet model
+- 5 convolutional layers.
+- 3 fully connected layers
+- Optimizer: RMSprop()
+- Loss Function: Sparse Categorical Crossentropy
+- Accuracy: 99.38%
 
-[Link to Notebook](link_to_cnn_handwritten_recognition_notebook)
+[Notebook for recognition model](https://github.com/beatlesatani/OCR_project/blob/d14516a2c8d4bba47315db06f539d93973656dc7/recognition_modeling.ipynb)
 
 ## 2. OCR Model
 
@@ -44,6 +51,7 @@ An automated flashcard generator that uses the Jisho API to retrieve word meanin
 3. Anki flashcards are generated and exported.
 
 [Link to Jisho API](https://jisho.org/)
+[Link to Anki API](https://ankiweb.net/shared/info/2055492159)
 
-[Link to Notebook](link_to_ocr_model_notebook)
+
 
