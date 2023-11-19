@@ -41,7 +41,6 @@ def home():
                 sha256_hash = "59292cd4f38367b7d35f169fe5398b770a5d06f9dc36f1b6a1f552d9f80e0ba1"
                 base64_hash = base64.urlsafe_b64encode(bytes.fromhex(sha256_hash)).decode()
                 saved_model_path = f"models/{base64_hash}/"
-                saved_model_path = "/Users/yusuke.s/Documents/GitHub/OCR_project/hiragana_recognition_cnn.h5"
                 model = tf.keras.models.load_model(saved_model_path)
                 processed_images = ocr_handwritten.process_images()
                 predicted = model.predict(processed_images)
